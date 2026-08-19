@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-gumroad-field="name">tsrdpi</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          brand: {
+            50: '#f0f9ff',
+            100: '#e0f2fe',
+            200: '#bae6fd',
+            300: '#7dd3fc',
+            400: '#38bdf8',
+            500: '#0ea5e9',
+            600: '#0284c7',
+            700: '#0369a1',
+            800: '#075985',
+            900: '#0c4a6e',
+          }
+        },
+        animation: {
+          'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+          'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        },
+        keyframes: {
+          fadeInUp: {
+            '0%': { opacity: '0', transform: 'translateY(30px)' },
+            '100%': { opacity: '1', transform: 'translateY(0)' },
+          }
+        }
+      }
+    }
+  }
+</script>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8fafc;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --border-color: #e2e8f0;
+  }
+  .dark {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --border-color: #334155;
+  }
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  .bg-theme-primary { background-color: var(--bg-primary); }
+  .bg-theme-secondary { background-color: var(--bg-secondary); }
+  .text-theme-primary { color: var(--text-primary); }
+  .text-theme-secondary { color: var(--text-secondary); }
+  .border-theme { border-color: var(--border-color); }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+  }
+  .reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Gradient mesh background using CSS only */
+  .gradient-mesh {
+    background:
+      radial-gradient(at 40% 20%, hsla(200,100%,50%,0.15) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, hsla(260,100%,60%,0.12) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, hsla(190,100%,50%,0.1) 0px, transparent 50%),
+      radial-gradient(at 80% 50%, hsla(280,100%,60%,0.08) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsla(200,100%,50%,0.12) 0px, transparent 50%);
+  }
+  .dark .gradient-mesh {
+    background:
+      radial-gradient(at 40% 20%, hsla(200,100%,50%,0.08) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, hsla(260,100%,60%,0.06) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, hsla(190,100%,50%,0.05) 0px, transparent 50%),
+      radial-gradient(at 80% 50%, hsla(280,100%,60%,0.04) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsla(200,100%,50%,0.06) 0px, transparent 50%);
+  }
+
+  /* Grid pattern */
+  .grid-pattern {
+    background-image: linear-gradient(var(--border-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.3;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+  /* Button hover glow */
+  .btn-glow {
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-glow::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+  .btn-glow:hover::before { left: 100%; }
+
+  /* FAQ accordion */
+  .faq-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, padding 0.4s ease;
+  }
+  .faq-item.open .faq-content {
+    max-height: 500px;
+  }
+  .faq-item.open .faq-icon {
+    transform: rotate(180deg);
+  }
+  .faq-icon { transition: transform 0.3s ease; }
+
+  /* Star rating */
+  .star-filled { color: #fbbf24; }
+  .star-empty { color: #cbd5e1; }
+  .dark .star-empty { color: #475569; }
+</style>
+<base target="_blank">
+</head>
+<body class="font-sans antialiased min-h-screen">
+
+<!-- Theme Toggle -->
+<button id="theme-toggle" class="fixed top-4 right-4 z-50 p-3 rounded-full bg-theme-secondary border border-theme shadow-lg hover:shadow-xl transition-all duration-300" aria-label="Toggle dark mode">
+  <svg id="sun-icon" class="w-5 h-5 hidden dark:block text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+  <svg id="moon-icon" class="w-5 h-5 block dark:hidden text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+</button>
+
+<!-- Navigation -->
+<nav class="fixed top-0 left-0 right-0 z-40 bg-theme-primary/80 backdrop-blur-md border-b border-theme">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <a href="#" class="text-xl font-bold text-theme-primary tracking-tight">
+        <span data-gumroad-field="name">tsrdpi</span>
+      </a>
+      <div class="hidden md:flex items-center space-x-8">
+        <a href="#features" class="text-sm font-medium text-theme-secondary hover:text-brand-500 transition-colors">Features</a>
+        <a href="#testimonials" class="text-sm font-medium text-theme-secondary hover:text-brand-500 transition-colors">Reviews</a>
+        <a href="#faq" class="text-sm font-medium text-theme-secondary hover:text-brand-500 transition-colors">FAQ</a>
+        <a data-gumroad-action="buy" class="px-4 py-2 text-sm font-semibold text-white bg-brand-600 rounded-lg hover:bg-brand-700 transition-colors cursor-pointer btn-glow">Get it now</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
+  <div class="absolute inset-0 gradient-mesh"></div>
+  <div class="absolute inset-0 grid-pattern"></div>
+  <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto">
+      <div class="inline-flex items-center px-3 py-1 rounded-full bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 text-xs font-semibold tracking-wide uppercase mb-6 animate-fade-in-up">
+        <span class="w-2 h-2 rounded-full bg-brand-500 mr-2 animate-pulse-slow"></span>
+        Now available
+      </div>
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-theme-primary tracking-tight mb-6 animate-fade-in-up" style="animation-delay: 0.1s">
+        <span data-gumroad-field="name">tsrdpi</span>
+      </h1>
+      <p class="text-lg sm:text-xl text-theme-secondary mb-4 animate-fade-in-up" style="animation-delay: 0.2s" data-gumroad-field="description">
+        A powerful digital product designed to help you work smarter, create faster, and achieve more. Built with precision for creators who demand excellence.
+      </p>
+      <div class="flex items-center justify-center gap-2 mb-10 animate-fade-in-up" style="animation-delay: 0.25s">
+        <div class="flex items-center" id="rating-stars">
+          <svg class="w-5 h-5 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-5 h-5 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-5 h-5 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-5 h-5 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-5 h-5 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        </div>
+        <span class="text-sm text-theme-secondary">
+          <span data-gumroad-field="rating">5.0</span> (<span data-gumroad-field="review-count">Be the first to review</span>)
+        </span>
+      </div>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up" style="animation-delay: 0.3s">
+        <a data-gumroad-action="buy" class="w-full sm:w-auto px-8 py-4 text-lg font-bold text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition-all duration-300 shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 cursor-pointer btn-glow text-center">
+          I want this!
+        </a>
+        <a href="#features" class="w-full sm:w-auto px-8 py-4 text-lg font-semibold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/20 rounded-xl hover:bg-brand-100 dark:hover:bg-brand-900/30 transition-all duration-300 text-center border border-brand-200 dark:border-brand-800">
+          Learn more
+        </a>
+      </div>
+      <p class="mt-4 text-sm text-theme-secondary animate-fade-in-up" style="animation-delay: 0.4s">
+        Instant download. Lifetime access. Works on all devices.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Product Preview / Visual -->
+<section class="py-12 lg:py-20 bg-theme-secondary">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="reveal relative rounded-2xl overflow-hidden border border-theme shadow-2xl bg-theme-primary">
+      <!-- Decorative code/editor-like header -->
+      <div class="flex items-center px-4 py-3 border-b border-theme bg-theme-secondary">
+        <div class="flex space-x-2">
+          <div class="w-3 h-3 rounded-full bg-red-400"></div>
+          <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+          <div class="w-3 h-3 rounded-full bg-green-400"></div>
+        </div>
+        <div class="ml-4 text-xs text-theme-secondary font-mono">tsrdpi — preview</div>
+      </div>
+      <div class="p-8 lg:p-12">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 class="text-3xl font-bold text-theme-primary mb-4">Everything you need, in one place</h2>
+            <p class="text-theme-secondary mb-6 leading-relaxed">
+              This product has been carefully crafted to solve real problems. No fluff, no filler — just pure value that you can put to work immediately.
+            </p>
+            <ul class="space-y-3">
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-brand-500 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span class="text-theme-secondary">Instant digital delivery</span>
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-brand-500 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span class="text-theme-secondary">Regular updates included</span>
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-brand-500 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span class="text-theme-secondary">Compatible with your existing workflow</span>
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-brand-500 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span class="text-theme-secondary">Detailed documentation provided</span>
+              </li>
+            </ul>
+          </div>
+          <div class="relative">
+            <!-- Abstract product visual using CSS shapes -->
+            <div class="aspect-square rounded-xl bg-gradient-to-br from-brand-500/20 to-purple-500/20 border border-brand-200 dark:border-brand-800 flex items-center justify-center">
+              <div class="text-center">
+                <div class="w-24 h-24 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 shadow-lg flex items-center justify-center">
+                  <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <p class="text-sm font-semibold text-theme-primary">tsrdpi</p>
+                <p class="text-xs text-theme-secondary mt-1">Digital Product</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-20 lg:py-28">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16 reveal">
+      <h2 class="text-3xl sm:text-4xl font-bold text-theme-primary mb-4">Why creators love this</h2>
+      <p class="text-lg text-theme-secondary max-w-2xl mx-auto">Designed with attention to detail and built for real-world use cases.</p>
+    </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="reveal p-6 rounded-2xl bg-theme-secondary border border-theme hover:border-brand-300 dark:hover:border-brand-700 transition-all duration-300 group">
+        <div class="w-12 h-12 rounded-xl bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+          <svg class="w-6 h-6 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        </div>
+        <h3 class="text-lg font-semibold text-theme-primary mb-2">Lightning Fast</h3>
+        <p class="text-theme-secondary text-sm leading-relaxed">Optimized for performance so you spend less time waiting and more time creating.</p>
+      </div>
+      <div class="reveal p-6 rounded-2xl bg-theme-secondary border border-theme hover:border-brand-300 dark:hover:border-brand-700 transition-all duration-300 group" style="transition-delay: 0.1s">
+        <div class="w-12 h-12 rounded-xl bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+          <svg class="w-6 h-6 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+        </div>
+        <h3 class="text-lg font-semibold text-theme-primary mb-2">Fully Customizable</h3>
+        <p class="text-theme-secondary text-sm leading-relaxed">Adapt it to your exact needs. Flexible structure that bends without breaking.</p>
+      </div>
+      <div class="reveal p-6 rounded-2xl bg-theme-secondary border border-theme hover:border-brand-300 dark:hover:border-brand-700 transition-all duration-300 group" style="transition-delay: 0.2s">
+        <div class="w-12 h-12 rounded-xl bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+          <svg class="w-6 h-6 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+        </div>
+        <h3 class="text-lg font-semibold text-theme-primary mb-2">Battle Tested</h3>
+        <p class="text-theme-secondary text-sm leading-relaxed">Rigorously tested across multiple scenarios to ensure reliability when it matters.</p>
+      </div>
+      <div class="reveal p-6 rounded-2xl bg-theme-secondary border border-theme hover:border-brand-300 dark:hover:border-brand-700 transition-all duration-300 group">
+        <div class="w-12 h-12 rounded-xl bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+          <svg class="w-6 h-6 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
+        </div>
+        <h3 class="text-lg font-semibold text-theme-primary mb-2">Well Organized</h3>
+        <p class="text-theme-secondary text-sm leading-relaxed">Clean structure and clear labeling so you always know where everything lives.</p>
+      </div>
+      <div class="reveal p-6 rounded-2xl bg-theme-secondary border border-theme hover:border-brand-300 dark:hover:border-brand-700 transition-all duration-300 group" style="transition-delay: 0.1s">
+        <div class="w-12 h-12 rounded-xl bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+          <svg class="w-6 h-6 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+        </div>
+        <h3 class="text-lg font-semibold text-theme-primary mb-2">Documentation</h3>
+        <p class="text-theme-secondary text-sm leading-relaxed">Comprehensive guides and examples to get you up and running in minutes, not hours.</p>
+      </div>
+      <div class="reveal p-6 rounded-2xl bg-theme-secondary border border-theme hover:border-brand-300 dark:hover:border-brand-700 transition-all duration-300 group" style="transition-delay: 0.2s">
+        <div class="w-12 h-12 rounded-xl bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+          <svg class="w-6 h-6 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        </div>
+        <h3 class="text-lg font-semibold text-theme-primary mb-2">Cross Platform</h3>
+        <p class="text-theme-secondary text-sm leading-relaxed">Works seamlessly across all your devices and integrates with your favorite tools.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Social Proof / Testimonials -->
+<section id="testimonials" class="py-20 lg:py-28 bg-theme-secondary">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16 reveal">
+      <h2 class="text-3xl sm:text-4xl font-bold text-theme-primary mb-4">Loved by creators</h2>
+      <p class="text-lg text-theme-secondary">Join thousands of satisfied customers who have already made the switch.</p>
+    </div>
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="reveal p-6 rounded-2xl bg-theme-primary border border-theme">
+        <div class="flex items-center mb-4">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-bold text-sm">JD</div>
+          <div class="ml-3">
+            <p class="text-sm font-semibold text-theme-primary">Jordan Doe</p>
+            <p class="text-xs text-theme-secondary">Designer</p>
+          </div>
+        </div>
+        <div class="flex mb-3">
+          <svg class="w-4 h-4 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        </div>
+        <p class="text-theme-secondary text-sm leading-relaxed">"Exactly what I was looking for. Saved me hours of setup time and the quality is outstanding. Highly recommend!"</p>
+      </div>
+      <div class="reveal p-6 rounded-2xl bg-theme-primary border border-theme" style="transition-delay: 0.1s">
+        <div class="flex items-center mb-4">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold text-sm">AS</div>
+          <div class="ml-3">
+            <p class="text-sm font-semibold text-theme-primary">Alex Smith</p>
+            <p class="text-xs text-theme-secondary">Developer</p>
+          </div>
+        </div>
+        <div class="flex mb-3">
+          <svg class="w-4 h-4 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        </div>
+        <p class="text-theme-secondary text-sm leading-relaxed">"The attention to detail is incredible. Everything is organized logically and the documentation made integration a breeze."</p>
+      </div>
+      <div class="reveal p-6 rounded-2xl bg-theme-primary border border-theme" style="transition-delay: 0.2s">
+        <div class="flex items-center mb-4">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white font-bold text-sm">MK</div>
+          <div class="ml-3">
+            <p class="text-sm font-semibold text-theme-primary">Maria Kim</p>
+            <p class="text-xs text-theme-secondary">Creator</p>
+          </div>
+        </div>
+        <div class="flex mb-3">
+          <svg class="w-4 h-4 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-filled" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        </div>
+        <p class="text-theme-secondary text-sm leading-relaxed">"Worth every penny. I've tried many alternatives and this one stands out for its clarity and thoughtful design."</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section id="faq" class="py-20 lg:py-28">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16 reveal">
+      <h2 class="text-3xl sm:text-4xl font-bold text-theme-primary mb-4">Frequently asked questions</h2>
+      <p class="text-lg text-theme-secondary">Everything you need to know before purchasing.</p>
+    </div>
+    <div class="space-y-4">
+      <div class="faq-item reveal border border-theme rounded-xl bg-theme-secondary overflow-hidden cursor-pointer" onclick="toggleFaq(this)">
+        <div class="flex items-center justify-between p-5">
+          <h3 class="text-sm font-semibold text-theme-primary pr-4">What exactly will I receive after purchase?</h3>
+          <svg class="faq-icon w-5 h-5 text-theme-secondary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </div>
+        <div class="faq-content px-5">
+          <p class="text-sm text-theme-secondary pb-5 leading-relaxed">You will receive instant access to download the complete product files. Everything is delivered digitally through Gumroad, so you can get started immediately after completing your purchase.</p>
+        </div>
+      </div>
+      <div class="faq-item reveal border border-theme rounded-xl bg-theme-secondary overflow-hidden cursor-pointer" onclick="toggleFaq(this)" style="transition-delay: 0.05s">
+        <div class="flex items-center justify-between p-5">
+          <h3 class="text-sm font-semibold text-theme-primary pr-4">Is this a one-time purchase or a subscription?</h3>
+          <svg class="faq-icon w-5 h-5 text-theme-secondary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </div>
+        <div class="faq-content px-5">
+          <p class="text-sm text-theme-secondary pb-5 leading-relaxed">This is a one-time purchase. You pay once and get lifetime access to the product, including any future updates at no additional cost.</p>
+        </div>
+      </div>
+      <div class="faq-item reveal border border-theme rounded-xl bg-theme-secondary overflow-hidden cursor-pointer" onclick="toggleFaq(this)" style="transition-delay: 0.1s">
+        <div class="flex items-center justify-between p-5">
+          <h3 class="text-sm font-semibold text-theme-primary pr-4">Can I use this for commercial projects?</h3>
+          <svg class="faq-icon w-5 h-5 text-theme-secondary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </div>
+        <div class="faq-content px-5">
+          <p class="text-sm text-theme-secondary pb-5 leading-relaxed">Yes, your purchase includes a license that covers both personal and commercial use. You can use this in client projects, products you sell, or anything else you create.</p>
+        </div>
+      </div>
+      <div class="faq-item reveal border border-theme rounded-xl bg-theme-secondary overflow-hidden cursor-pointer" onclick="toggleFaq(this)" style="transition-delay: 0.15s">
+        <div class="flex items-center justify-between p-5">
+          <h3 class="text-sm font-semibold text-theme-primary pr-4">What if I need help or have questions?</h3>
+          <svg class="faq-icon w-5 h-5 text-theme-secondary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </div>
+        <div class="faq-content px-5">
+          <p class="text-sm text-theme-secondary pb-5 leading-relaxed">Every purchase includes access to detailed documentation. If you need additional support, you can reach out through Gumroad and I will get back to you as soon as possible.</p>
+        </div>
+      </div>
+      <div class="faq-item reveal border border-theme rounded-xl bg-theme-secondary overflow-hidden cursor-pointer" onclick="toggleFaq(this)" style="transition-delay: 0.2s">
+        <div class="flex items-center justify-between p-5">
+          <h3 class="text-sm font-semibold text-theme-primary pr-4">Do you offer refunds?</h3>
+          <svg class="faq-icon w-5 h-5 text-theme-secondary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </div>
+        <div class="faq-content px-5">
+          <p class="text-sm text-theme-secondary pb-5 leading-relaxed">Due to the digital nature of this product, all sales are final. Please review the product description carefully before purchasing to ensure it meets your needs.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing / CTA Section -->
+<section class="py-20 lg:py-28 bg-theme-secondary relative overflow-hidden">
+  <div class="absolute inset-0 gradient-mesh opacity-50"></div>
+  <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div class="reveal">
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-theme-primary mb-6">Ready to get started?</h2>
+      <p class="text-lg text-theme-secondary mb-8 max-w-2xl mx-auto">Join the community of creators who are already using <span data-gumroad-field="name">tsrdpi</span> to level up their workflow.</p>
+
+      <div class="inline-block p-8 rounded-2xl bg-theme-primary border border-theme shadow-xl mb-8">
+        <p class="text-sm text-theme-secondary uppercase tracking-wide font-semibold mb-2">One-time purchase</p>
+        <div class="flex items-baseline justify-center gap-1 mb-4">
+          <span class="text-5xl font-extrabold text-theme-primary" data-gumroad-field="price">$15</span>
+        </div>
+        <ul class="text-left space-y-3 mb-6 text-sm text-theme-secondary">
+          <li class="flex items-center"><svg class="w-4 h-4 text-brand-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Lifetime access</li>
+          <li class="flex items-center"><svg class="w-4 h-4 text-brand-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>All future updates</li>
+          <li class="flex items-center"><svg class="w-4 h-4 text-brand-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Commercial license</li>
+          <li class="flex items-center"><svg class="w-4 h-4 text-brand-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Instant download</li>
+        </ul>
+        <a data-gumroad-action="buy" class="block w-full px-8 py-4 text-lg font-bold text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition-all duration-300 shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 cursor-pointer btn-glow text-center">
+          I want this!
+        </a>
+        <p class="mt-4 text-xs text-theme-secondary">Secure checkout powered by Gumroad</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-12 border-t border-theme bg-theme-primary">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="text-sm text-theme-secondary">
+        &copy; <span id="year"></span> <span data-gumroad-field="name">tsrdpi</span>. All rights reserved.
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="https://gumroad.com" target="_blank" class="text-sm text-theme-secondary hover:text-brand-500 transition-colors">Powered by Gumroad</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Theme toggle
+  const themeToggle = document.getElementById('theme-toggle');
+  const html = document.documentElement;
+
+  // Check for saved theme preference or default to light
+  if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    html.classList.add('dark');
+  }
+
+  themeToggle.addEventListener('click', () => {
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+
+  // Set year
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // FAQ toggle
+  function toggleFaq(item) {
+    const allItems = document.querySelectorAll('.faq-item');
+    const isOpen = item.classList.contains('open');
+    allItems.forEach(i => i.classList.remove('open'));
+    if (!isOpen) {
+      item.classList.add('open');
+    }
+  }
+
+  // Scroll reveal
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.1
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('active');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+</body>
+</html>
